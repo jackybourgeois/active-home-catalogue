@@ -1,0 +1,95 @@
+<!--
+  #%L
+  Active Home :: Store
+  $Id:$
+  $HeadURL:$
+  %%
+  Copyright (C) 2016 org.activehome
+  %%
+  This program is free software: you can redistribute it and/or modify
+  it under the terms of the GNU General Public License as
+  published by the Free Software Foundation, either version 3 of the 
+  License, or (at your option) any later version.
+  
+  This program is distributed in the hope that it will be useful,
+  but WITHOUT ANY WARRANTY; without even the implied warranty of
+  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+  GNU General Public License for more details.
+  
+  You should have received a copy of the GNU General Public 
+  License along with this program.  If not, see
+  <http://www.gnu.org/licenses/gpl-3.0.html>.
+  #L%
+  -->
+<link rel="import" href="/bower_components/paper-button/paper-button.html">
+<link rel="import" href="/bower_components/iron-icon/iron-icon.html">
+<link rel="import" href="/bower_components/iron-icons/iron-icons.html">
+
+<dom-module id="store-item">
+
+    <template>
+
+        <style>
+            .storeItem {
+                background-color:#dfdfdf;
+                margin:10px;padding:5px;
+                border-radius:2px;
+                box-shadow:6px 6px 3px 0 rgba(0, 0, 0, 0.26);
+                -webkit-box-shadow:6px 6px 3px 0 rgba(0, 0, 0, 0.26);
+                -moz-box-shadow:6px 6px 3px 0 rgba(0, 0, 0, 0.26);
+                float:left;
+            }
+        </style>
+
+        <div class="storeItem">
+            {{item.name}}<br>
+            {{item.version}}<br>
+            <paper-button raised on-click="{{install}}">
+                <iron-icon icon="check"></iron-icon>
+                Install
+            </paper-button>
+        </div>
+    </template>
+
+    <script>
+        Polymer({
+            is: 'store-item',
+            properties: {
+                item: {
+                    type: Object,
+                    value: {name:"-",version:"-",description:"-",img:"-"}
+                }
+            },
+            defaultHeight: 2,
+            defaultWidth: 2,
+            defaultAttributes: {},
+            imports: [],
+
+            ready: function() {
+
+            },
+
+            install: function() {
+//                var widget = {};
+//                widget.type = "org.activehome.ui.WidgetView";
+//                widget.id = "${node}.widget-" + this.guid();
+//                widget.x = 0;
+//                widget.y = 0;
+//                widget.width = this.defaultWidth;
+//                widget.height = this.defaultHeight;
+//                widget.component = this.widgetId;
+//                widget.attributes = this.defaultAttributes;
+//                widget.import = this.imports.split(",");
+//                var ajax = document.querySelector("store-view").install(widget);
+            },
+
+            guid: function() {
+                function s4() {
+                    return Math.floor((1 + Math.random()) * 0x10000).toString(16).substring(1);
+                }
+                return s4() + s4() + '-' + s4() + '-' + s4() + '-' +
+                        s4() + '-' + s4() + s4() + s4();
+            }
+        });
+    </script>
+</dom-module>
