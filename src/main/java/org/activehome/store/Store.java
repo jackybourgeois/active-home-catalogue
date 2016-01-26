@@ -37,6 +37,7 @@ import org.activehome.service.RequestHandler;
 import org.activehome.tools.Util;
 import org.activehome.context.data.UserInfo;
 import org.kevoree.annotation.ComponentType;
+import org.kevoree.annotation.Param;
 import org.kevoree.annotation.Start;
 import org.kevoree.api.handler.UUIDModel;
 import org.kevoree.log.Log;
@@ -58,6 +59,11 @@ import java.util.Map;
  */
 @ComponentType
 public class Store extends Service {
+
+    @Param(defaultValue = "A store of component!")
+    private String description;
+    @Param(defaultValue = "An image!")
+    private String img;
 
     @Override
     protected RequestHandler getRequestHandler(Request request) {
@@ -122,15 +128,35 @@ public class Store extends Service {
         if (jsonPack.get("packages") != null) {
             for (JsonValue ahPack : jsonPack.get("packages").asArray()) {
                 for (JsonValue td : ahPack.asObject().get("typeDefinitions").asArray()) {
-                    String version = td.asObject().get("version").asString();
                     String name = td.asObject().get("name").asString();
+                    String version = td.asObject().get("version").asString();
+                    boolean isAbstract = Boolean.valueOf(td.asObject().get("abstract").asString());
+
+                    String description = "";
+                    String img = "";
+                    JsonArray dictionaryArray = td.asObject().get("dictionaryType").asArray();
+                    if (dictionaryArray.size() > 0) {
+                        JsonArray attrArray = dictionaryArray.get(0).asObject().get("attributes").asArray();
+                        for (JsonValue attr : attrArray) {
+                            String attrName = attr.asObject().getString("name", "");
+                            String attrDefValue = attr.asObject().getString("defaultValue", "");
+                            if (attrName.equals("description")) {
+                                description = attrDefValue;
+                            } else if (attrName.equals("img")) {
+                                img = attrDefValue;
+                            }
+                        }
+                    }
+
                     String pack = "";
                     for (JsonValue md : td.asObject().get("metaData").asArray()) {
                         if (md.asObject().get("name").asString().equals("java.class")) {
                             pack = md.asObject().get("value").asString();
                         }
                     }
-                    items.add(new StoreItem(name, version, pack));
+                    if (!name.contains("Test") && !isAbstract) {
+                        items.add(new StoreItem(name, version, pack, description, img));
+                    }
                 }
                 items.addAll(searchPackage(ahPack.asObject()));
             }

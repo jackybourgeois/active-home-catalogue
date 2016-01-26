@@ -30,25 +30,40 @@
 <link rel="import" href="/bower_components/iron-ajax/iron-ajax.html">
 <link rel="import" href="/bower_components/paper-button/paper-button.html">
 <link rel="import" href="/bower_components/paper-icon-button/paper-icon-button.html">
+<link rel="import" href="/bower_components/paper-header-panel/paper-header-panel.html">
+<link rel="import" href="/bower_components/paper-toolbar/paper-toolbar.html">
+<link rel="import" href="/bower_components/paper-icon-button/paper-icon-button.html">
+<link rel="import" href="/${id}/theme.html">
 <link rel="import" href="/${id}/store-item.html">
+<link rel="import" href="/loading-spinner.html">
+
 
 <dom-module id="store-view">
 
     <template>
         <iron-ajax id="ajax" handle-as="json" on-response="handleResponse"></iron-ajax>
 
-        <loading-spinner></loading-spinner>
+        <paper-header-panel>
+            <paper-toolbar>
+                <paper-icon-button icon="arrow-back" on-click="back"></paper-icon-button>
+                <div flex>Active Home - Component catalog</div>
+                <iron-icon icon="filter-list" id="core_icon"></iron-icon>
+                <paper-input id="filter-input" label="API, Service, IO..."
+                             on-change="filterInput" on-keyup="filterInput"></paper-input>
+                <paper-icon-button icon="clear" on-tap="clearFilter"></paper-icon-button>
+            </paper-toolbar>
 
-        <nav style="text-align: center">
-            <iron-icon icon="filter-list" id="core_icon"></iron-icon>
-            <paper-input id="filter-input" label="API, Service, IO..."
-                         on-change="filterInput" on-keyup="filterInput" flex></paper-input>
-            <paper-icon-button icon="clear" on-tap="clearFilter"></paper-icon-button>
-        </nav>
 
-        <template is="dom-repeat" items="{{filteredItemList}}">
-            <store-item item="{{item}}"></store-item>
-        </template>
+            <loading-spinner id="spinner"></loading-spinner>
+
+            <section hero style="max-width:1200px;margin:auto;text-align: center">
+                <template is="dom-repeat" items="{{filteredItemList}}">
+                    <store-item name="{{item.name}}" version="{{item.version}}"
+                                description="{{item.description}}" img="{{item.img}}"></store-item>
+                </template>
+            </section>
+        </paper-header-panel>
+
     </template>
 
     <script>
@@ -58,6 +73,7 @@
             filteredItemList: null,
 
             ready: function () {
+                this.$.spinner.display();
                 var ajax = this.$.ajax;
                 ajax.method = "GET";
                 ajax.url = "/${id}/getStoreItems";
@@ -74,6 +90,7 @@
                     this.itemList = data;
                     this.filteredItemList = data;
                 }
+                this.$.spinner.hide();
             },
 
             install: function (widget) {
@@ -85,8 +102,12 @@
                 ajax.generateRequest();
             },
 
+            back: function() {
+                document.location.href = "/";
+            },
+
             filterInput: function(e, detail, sender) {
-                this.filter(new RegExp(sender.value));
+                this.filter(new RegExp(e.srcElement.value));
             },
 
             filter: function(regex) {

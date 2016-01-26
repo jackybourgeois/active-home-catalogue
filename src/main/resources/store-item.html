@@ -22,42 +22,79 @@
   #L%
   -->
 <link rel="import" href="/bower_components/paper-button/paper-button.html">
+<link rel="import" href="/bower_components/paper-icon-button/paper-icon-button.html">
 <link rel="import" href="/bower_components/iron-icon/iron-icon.html">
 <link rel="import" href="/bower_components/iron-icons/iron-icons.html">
+<link rel="import" href="/bower_components/paper-card/paper-card.html">
 
 <dom-module id="store-item">
 
     <template>
 
         <style>
-            .storeItem {
-                background-color:#dfdfdf;
-                margin:10px;padding:5px;
-                border-radius:2px;
-                box-shadow:6px 6px 3px 0 rgba(0, 0, 0, 0.26);
-                -webkit-box-shadow:6px 6px 3px 0 rgba(0, 0, 0, 0.26);
-                -moz-box-shadow:6px 6px 3px 0 rgba(0, 0, 0, 0.26);
-                float:left;
+
+            .version {
+                display: inline;
+                padding: .2em .6em;
+                font-size: 75%;
+                font-weight: 700;
+                line-height: 1;
+                color: #fff;
+                text-align: center;
+                white-space: nowrap;
+                vertical-align: baseline;
+                -webkit-border-radius: 0.25em;
+                -moz-border-radius: 0.25em;
+                -ms-border-radius: 0.25em;
+                -o-border-radius: 0.25em;
+                border-radius: 0.25em;
+                position: absolute;
+                top: -5px;
+                right: -5px;
             }
+
+            .itemIcon {
+                width: 60px;
+                float: left;
+                margin: 5px;
+            }
+
         </style>
 
-        <div class="storeItem">
-            {{item.name}}<br>
-            {{item.version}}<br>
-            <paper-button raised on-click="{{install}}">
-                <iron-icon icon="check"></iron-icon>
-                Install
-            </paper-button>
-        </div>
+        <paper-card heading="{{formattedName}}" style="width: 300px; height: 300px; margin: 20px" >
+            <div class="card-content">
+                <span style="min-height: 70px;text-align: left">{{description}}</span>
+                <span id="versionType" class="version">v. {{version}}</span>
+            </div>
+            <div class="card-actions" >
+                <paper-icon-button on-click="install" icon="get-app"></paper-icon-button>
+                <paper-icon-button on-click="more" icon="more-horiz"></paper-icon-button>
+            </div>
+        </paper-card>
+
     </template>
 
     <script>
         Polymer({
             is: 'store-item',
             properties: {
-                item: {
-                    type: Object,
-                    value: {name:"-",version:"-",description:"-",img:"-"}
+                formattedName: {
+                    type: String,
+                    value: "-",
+                },
+                name: {
+                    type: String,
+                    value: "-",
+                    observer: "formatName"
+                },
+                version: {
+                    type: String,
+                    value: "-",
+                    observer: "formatVersion"
+                },
+                description: {
+                    type: String,
+                    value: "-"
                 }
             },
             defaultHeight: 2,
@@ -65,11 +102,30 @@
             defaultAttributes: {},
             imports: [],
 
-            ready: function() {
+            ready: function () {
 
             },
 
-            install: function() {
+            formatName: function() {
+                this.formattedName = "";
+                var wordArray = this.name.split(/(?=[A-Z])/);
+                for (var i=0; i<wordArray.length; i++) {
+                    this.formattedName += wordArray[i];
+                    if (wordArray[i].length>1) {
+                        this.formattedName += " ";
+                    }
+                }
+            },
+
+            formatVersion: function() {
+                if (this.version.endsWith("SNAPSHOT")) {
+                    this.$.versionType.style.background = "orangered";
+                } else {
+                    this.$.versionType.style.background = "green";
+                }
+            },
+
+            install: function () {
 //                var widget = {};
 //                widget.type = "org.activehome.ui.WidgetView";
 //                widget.id = "${node}.widget-" + this.guid();
@@ -83,10 +139,15 @@
 //                var ajax = document.querySelector("store-view").install(widget);
             },
 
-            guid: function() {
+            more: function() {
+                console.log("get more detail...")
+            },
+
+            guid: function () {
                 function s4() {
                     return Math.floor((1 + Math.random()) * 0x10000).toString(16).substring(1);
                 }
+
                 return s4() + s4() + '-' + s4() + '-' + s4() + '-' +
                         s4() + '-' + s4() + s4() + s4();
             }

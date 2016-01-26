@@ -53,7 +53,7 @@ public class StoreRequestHandler implements RequestHandler {
     public Object html() {
         JsonObject wrap = new JsonObject();
         wrap.add("name", "store-view");
-        wrap.add("url", service.getId() + "/store-view_backup.html");
+        wrap.add("url", service.getId() + "/store-view.html");
         wrap.add("title", "Active Home Store");
         wrap.add("description", "Active Home Store");
 

@@ -36,19 +36,27 @@ public class StoreItem {
     private String name;
     private String version;
     private String pack;
+    private String description;
+    private String img;
 
     public StoreItem(final String name,
                      final String version,
-                     final String pack) {
+                     final String pack,
+                     final String description,
+                     final String img) {
         this.name = name;
         this.version = version;
         this.pack = pack;
+        this.description = description;
+        this.img = img;
     }
 
     public StoreItem(final JsonObject json) {
-        this.name = json.get("name").asString();
-        this.version = json.get("version").asString();
-        this.pack = json.get("pack").asString();
+        this.name = json.getString("name", "");
+        this.version = json.getString("version","");
+        this.pack = json.getString("pack","");
+        this.description = json.getString("description", "");
+        this.img = json.getString("img", "");
     }
 
     public String getName() {
@@ -69,6 +77,8 @@ public class StoreItem {
         json.add("name", name);
         json.add("version", version);
         json.add("pack", pack);
+        json.add("description", description);
+        json.add("img", img);
         return json;
     }
 
