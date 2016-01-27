@@ -25,6 +25,7 @@
 <link rel="import" href="/bower_components/paper-icon-button/paper-icon-button.html">
 <link rel="import" href="/bower_components/iron-icon/iron-icon.html">
 <link rel="import" href="/bower_components/iron-icons/iron-icons.html">
+<link rel="import" href="/bower_components/iron-icons/image-icons.html">
 <link rel="import" href="/bower_components/paper-card/paper-card.html">
 
 <dom-module id="store-item">
@@ -59,16 +60,26 @@
                 margin: 5px;
             }
 
+            :host {
+                --paper-card-header-text: {
+                    font-size: 14px;
+                    font-weight: bold;
+                };
+            }
+
+
         </style>
 
-        <paper-card heading="{{formattedName}}" style="width: 300px; height: 300px; margin: 20px" >
-            <div class="card-content">
-                <span style="min-height: 70px;text-align: left">{{description}}</span>
+        <paper-card id="itemCard" heading="{{formattedName}}" style="width: 300px; margin: 10px" >
+            <div class="card-content" style="height: 100px;text-align: left">
                 <span id="versionType" class="version">v. {{version}}</span>
+                <span style="min-height: 70px;text-align: left">{{description}}</span>
             </div>
             <div class="card-actions" >
                 <paper-icon-button on-click="install" icon="get-app"></paper-icon-button>
-                <paper-icon-button on-click="more" icon="more-horiz"></paper-icon-button>
+                <paper-icon-button on-click="demo" icon="image:remove-red-eye"></paper-icon-button>
+                <paper-icon-button on-click="showDoc" icon="info"></paper-icon-button>
+                <paper-icon-button on-click="showSource" icon="code"></paper-icon-button>
             </div>
         </paper-card>
 
@@ -95,6 +106,19 @@
                 description: {
                     type: String,
                     value: "-"
+                },
+                doc: {
+                    type: String,
+                    value: ""
+                },
+                demoScript: {
+                    type: String,
+                    value: ""
+                },
+                st: {
+                    type: String,
+                    value: "",
+                    observer: "formatSuperType"
                 }
             },
             defaultHeight: 2,
@@ -125,6 +149,34 @@
                 }
             },
 
+            formatSuperType: function() {
+                console.log(this.st)
+                this.$.itemCard.style.background = this.getColourFromType();
+            },
+
+            getColourFromType: function () {
+                if (this.name=="User") {
+                    this.st="User";
+                }
+                switch (this.st) {
+                    case "IO": return "#d38d5f";
+                    case "Appliance": return "#d38d5f";
+                    case "MicroGeneration": return "#d38d5f";
+                    case "Storage": return "#d38d5f";
+                    case "Meter": return "#d38d5f";
+                    case "FiscalMeter": return "#d38d5f";
+                    case "BackgroundAppliance": return "#d38d5f";
+                    case "InteractiveAppliance": return "#d38d5f";
+                    case "API": return "#afdde9";
+                    case "Predictor": return "#ffaa80";
+                    case "Evaluator": return "#ffce80";
+                    case "Context": return "#e980ff";
+                    case "Service": return "#ffe680";
+                    case "User": return "#aaffaa";
+                    default: return "#ffffff";
+                }
+            },
+
             install: function () {
 //                var widget = {};
 //                widget.type = "org.activehome.ui.WidgetView";
@@ -139,8 +191,17 @@
 //                var ajax = document.querySelector("store-view").install(widget);
             },
 
-            more: function() {
-                console.log("get more detail...")
+            demo: function() {
+                console.log(this.demoScript);
+            },
+
+            showSource: function() {
+                console.log("show source");
+            },
+
+            showDoc: function() {
+                console.log(this.doc);
+                this.fire('select-info-bt', {doc: this.doc});
             },
 
             guid: function () {

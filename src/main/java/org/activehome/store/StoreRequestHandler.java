@@ -28,12 +28,15 @@ package org.activehome.store;
 import com.eclipsesource.json.JsonObject;
 import com.eclipsesource.json.JsonValue;
 import org.activehome.com.Request;
+import org.activehome.com.RequestCallback;
 import org.activehome.com.error.*;
 import org.activehome.com.error.Error;
 import org.activehome.service.RequestHandler;
 import org.activehome.tools.file.FileHelper;
 import org.activehome.tools.file.TypeMime;
 import org.activehome.context.data.UserInfo;
+
+import java.io.UnsupportedEncodingException;
 
 /**
  * @author Jacky Bourgeois
@@ -50,7 +53,7 @@ public class StoreRequestHandler implements RequestHandler {
     }
 
 
-    public Object html() {
+    public void html(final RequestCallback callback) {
         JsonObject wrap = new JsonObject();
         wrap.add("name", "store-view");
         wrap.add("url", service.getId() + "/store-view.html");
@@ -59,7 +62,18 @@ public class StoreRequestHandler implements RequestHandler {
 
         JsonObject json = new JsonObject();
         json.add("wrap", wrap);
-        return json;
+        callback.success(json);
+    }
+
+    public void doc(final String url,
+                    final RequestCallback callback) {
+        try {
+            callback.success(service.getContentFrom(
+                    java.net.URLDecoder.decode(url, "UTF-8")));
+        } catch (UnsupportedEncodingException e) {
+            e.printStackTrace();
+            callback.error(new Error(ErrorType.METHOD_ERROR, "Unable to parse URL " + url));
+        }
     }
 
     public JsonValue file(String str) {

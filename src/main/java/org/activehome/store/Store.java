@@ -48,10 +48,7 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.URL;
-import java.util.HashMap;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 /**
  * @author Jacky Bourgeois
@@ -60,10 +57,16 @@ import java.util.Map;
 @ComponentType
 public class Store extends Service {
 
-    @Param(defaultValue = "A store of component!")
+    private static String BASE_VCS_URL = "https://raw.githubusercontent.com/jackybourgeois";
+
+    @Param(defaultValue = "A catalog of component!")
     private String description;
-    @Param(defaultValue = "An image!")
+    @Param(defaultValue = "/activehome-store/master/docs/store.png")
     private String img;
+    @Param(defaultValue = "/activehome-store/master/docs/store.md")
+    private String doc;
+    @Param(defaultValue = "/activehome-store/master/docs/demo.kevs")
+    private String demoScript;
 
     @Override
     protected RequestHandler getRequestHandler(Request request) {
@@ -106,62 +109,105 @@ public class Store extends Service {
     }
 
     public StoreItem[] getStoreItems() {
-        LinkedList<StoreItem> items = new LinkedList<>();
         HashMap<String, Object> response = sendGet("http://registry.kevoree.org/", null);
+
+        HashMap<String, StoreItem> items = new HashMap<>();
         if (response != null) {
             JsonObject root = JsonObject.readFrom((String) response.get("content"));
             for (JsonValue pack : root.get("packages").asArray()) {
                 if (pack.asObject().get("name").asString().equals("org")) {
                     for (JsonValue orgPack : pack.asObject().get("packages").asArray()) {
                         if (orgPack.asObject().get("name").asString().equals("activehome")) {
-                            items.addAll(searchPackage(orgPack.asObject()));
+                            searchPackage(items, orgPack.asObject());
                         }
                     }
                 }
             }
         }
-        return items.toArray(new StoreItem[items.size()]);
+        return items.values().toArray(new StoreItem[items.size()]);
     }
 
-    private LinkedList<StoreItem> searchPackage(final JsonObject jsonPack) {
-        LinkedList<StoreItem> items = new LinkedList<>();
-        if (jsonPack.get("packages") != null) {
-            for (JsonValue ahPack : jsonPack.get("packages").asArray()) {
-                for (JsonValue td : ahPack.asObject().get("typeDefinitions").asArray()) {
-                    String name = td.asObject().get("name").asString();
-                    String version = td.asObject().get("version").asString();
-                    boolean isAbstract = Boolean.valueOf(td.asObject().get("abstract").asString());
+    private void searchPackage(final HashMap<String, StoreItem> items,
+                               final JsonObject json) {
+        if (json.get("packages") != null) {
+            for (JsonValue packVal : json.get("packages").asArray()) {
+                JsonObject jsonPack = packVal.asObject();
+                if (accept(jsonPack.getString("name", ""))) {
+                    for (JsonValue td : jsonPack.get("typeDefinitions").asArray()) {
+                        String name = td.asObject().get("name").asString();
+                        String version = td.asObject().get("version").asString();
+                        boolean isAbstract = Boolean.valueOf(td.asObject().get("abstract").asString());
 
-                    String description = "";
-                    String img = "";
-                    JsonArray dictionaryArray = td.asObject().get("dictionaryType").asArray();
-                    if (dictionaryArray.size() > 0) {
-                        JsonArray attrArray = dictionaryArray.get(0).asObject().get("attributes").asArray();
-                        for (JsonValue attr : attrArray) {
-                            String attrName = attr.asObject().getString("name", "");
-                            String attrDefValue = attr.asObject().getString("defaultValue", "");
-                            if (attrName.equals("description")) {
-                                description = attrDefValue;
-                            } else if (attrName.equals("img")) {
-                                img = attrDefValue;
+                        JsonArray superTypesArray = td.asObject().get("superTypes").asArray();
+                        String superType = "";
+                        for (JsonValue stValue : superTypesArray) {
+                            String[] elems = stValue.asString().split("/");
+                            if (elems[elems.length - 1].startsWith("typeDefinitions")) {
+                                superType = elems[elems.length - 1].replace("typeDefinitions[name=", "");
+                                superType = superType.substring(0, superType.indexOf(","));
+                            }
+                        }
+
+                        String description = "";
+                        String img = "";
+                        String doc = "";
+                        String demoScript = "";
+                        JsonArray dictionaryArray = td.asObject().get("dictionaryType").asArray();
+                        if (dictionaryArray.size() > 0) {
+                            JsonArray attrArray = dictionaryArray.get(0).asObject().get("attributes").asArray();
+                            for (JsonValue attr : attrArray) {
+                                String attrName = attr.asObject().getString("name", "");
+                                String attrDefValue = attr.asObject().getString("defaultValue", "");
+                                switch (attrName) {
+                                    case "description":
+                                        description = attrDefValue;
+                                        break;
+                                    case "img":
+                                        if (attrDefValue.startsWith("/")) {
+                                            img = BASE_VCS_URL + attrDefValue;
+                                        } else {
+                                            img = attrDefValue;
+                                        }
+                                        break;
+                                    case "doc":
+                                        if (attrDefValue.startsWith("/")) {
+                                            doc = BASE_VCS_URL + attrDefValue;
+                                        } else {
+                                            doc = attrDefValue;
+                                        }
+                                        break;
+                                    case "demoScript":
+                                        if (attrDefValue.startsWith("/")) {
+                                            demoScript = BASE_VCS_URL + attrDefValue;
+                                        } else {
+                                            demoScript = attrDefValue;
+                                        }
+                                        break;
+                                }
+                            }
+                        }
+
+                        String pack = "";
+                        for (JsonValue md : td.asObject().get("metaData").asArray()) {
+                            if (md.asObject().get("name").asString().equals("java.class")) {
+                                pack = md.asObject().get("value").asString();
+                            }
+                        }
+                        if (!name.contains("Test") && !isAbstract) {
+                            if (!items.containsKey(name) || items.get(name).hasOlderVersionThan(version)) {
+                                items.put(name, new StoreItem(name, version, pack, description,
+                                        img, doc, demoScript, superType));
                             }
                         }
                     }
-
-                    String pack = "";
-                    for (JsonValue md : td.asObject().get("metaData").asArray()) {
-                        if (md.asObject().get("name").asString().equals("java.class")) {
-                            pack = md.asObject().get("value").asString();
-                        }
-                    }
-                    if (!name.contains("Test") && !isAbstract) {
-                        items.add(new StoreItem(name, version, pack, description, img));
-                    }
+                    searchPackage(items, jsonPack);
                 }
-                items.addAll(searchPackage(ahPack.asObject()));
             }
         }
-        return items;
+    }
+
+    public boolean accept(String name) {
+        return !(name.equals("service") || name.equals("api"));
     }
 
     public static HashMap<String, Object> sendGet(final String url,
@@ -204,7 +250,9 @@ public class Store extends Service {
         StringBuilder response = new StringBuilder();
 
         try {
-            while ((inputLine = in.readLine()) != null) response.append(inputLine);
+            while ((inputLine = in.readLine()) != null) {
+                response.append(inputLine).append("\n");
+            }
         } catch (IOException e) {
             e.printStackTrace();
         } finally {
@@ -216,6 +264,16 @@ public class Store extends Service {
         }
 
         return response.toString();
+    }
+
+    public String getContentFrom(String url) {
+        System.out.println("url to check: " + url);
+        HashMap<String, Object> response = sendGet(url, null);
+        if (response != null) {
+            System.out.println(response.get("content"));
+            return (String) response.get("content");
+        }
+        return "";
     }
 
 }
