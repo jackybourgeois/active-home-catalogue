@@ -109,17 +109,15 @@ public class Store extends Service {
     }
 
     public StoreItem[] getStoreItems() {
-        HashMap<String, Object> response = sendGet("http://registry.kevoree.org/", null);
+        String response = sendGet("http://registry.kevoree.org/", null);
 
         HashMap<String, StoreItem> items = new HashMap<>();
-        if (response != null) {
-            JsonObject root = JsonObject.readFrom((String) response.get("content"));
-            for (JsonValue pack : root.get("packages").asArray()) {
-                if (pack.asObject().get("name").asString().equals("org")) {
-                    for (JsonValue orgPack : pack.asObject().get("packages").asArray()) {
-                        if (orgPack.asObject().get("name").asString().equals("activehome")) {
-                            searchPackage(items, orgPack.asObject());
-                        }
+        JsonObject root = JsonObject.readFrom(response);
+        for (JsonValue pack : root.get("packages").asArray()) {
+            if (pack.asObject().get("name").asString().equals("org")) {
+                for (JsonValue orgPack : pack.asObject().get("packages").asArray()) {
+                    if (orgPack.asObject().get("name").asString().equals("activehome")) {
+                        searchPackage(items, orgPack.asObject());
                     }
                 }
             }
@@ -171,14 +169,14 @@ public class Store extends Service {
                                         break;
                                     case "doc":
                                         if (attrDefValue.startsWith("/")) {
-                                            doc = BASE_VCS_URL + attrDefValue;
+                                            doc = attrDefValue;
                                         } else {
                                             doc = attrDefValue;
                                         }
                                         break;
                                     case "demoScript":
                                         if (attrDefValue.startsWith("/")) {
-                                            demoScript = BASE_VCS_URL + attrDefValue;
+                                            demoScript = attrDefValue;
                                         } else {
                                             demoScript = attrDefValue;
                                         }
@@ -210,7 +208,7 @@ public class Store extends Service {
         return !(name.equals("service") || name.equals("api"));
     }
 
-    public static HashMap<String, Object> sendGet(final String url,
+    public static String sendGet(final String url,
                                                   final List<String> cookieList) {
         try {
             URL obj = new URL(url);
@@ -226,22 +224,14 @@ public class Store extends Service {
                 }
             }
 
-            HashMap<String, Object> responseMap = new HashMap<>();
-
             int responseCode = con.getResponseCode();
-            Map<String, List<String>> respHeaderMap = con.getHeaderFields();
-            for (Map.Entry<String, List<String>> entry : respHeaderMap.entrySet()) {
-                if (entry.getKey() != null && entry.getKey().compareTo("Set-Cookie") == 0)
-                    responseMap.put("Set-Cookie", entry.getValue());
-            }
 
-            responseMap.put("content", inputStreamToString(con.getInputStream()));
+            return inputStreamToString(con.getInputStream());
 
-            return responseMap;
         } catch (IOException e) {
-            e.printStackTrace();
+            Log.error(e.getMessage());
+            return "";
         }
-        return null;
     }
 
     public static String inputStreamToString(InputStream is) {
@@ -254,12 +244,12 @@ public class Store extends Service {
                 response.append(inputLine).append("\n");
             }
         } catch (IOException e) {
-            e.printStackTrace();
+            Log.error(e.getMessage());
         } finally {
             try {
                 in.close();
             } catch (IOException e) {
-                e.printStackTrace();
+                Log.error(e.getMessage());
             }
         }
 
@@ -267,13 +257,10 @@ public class Store extends Service {
     }
 
     public String getContentFrom(String url) {
-        System.out.println("url to check: " + url);
-        HashMap<String, Object> response = sendGet(url, null);
-        if (response != null) {
-            System.out.println(response.get("content"));
-            return (String) response.get("content");
+        if (url.startsWith("/")) {
+            url = BASE_VCS_URL + url;
         }
-        return "";
+        return sendGet(url, null);
     }
 
 }

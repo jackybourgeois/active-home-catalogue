@@ -67,19 +67,36 @@
                 };
             }
 
+            .label {
+                font-size: 10px;
+                margin-top: -5px;
+            }
+
 
         </style>
 
         <paper-card id="itemCard" heading="{{formattedName}}" style="width: 300px; margin: 10px" >
             <div class="card-content" style="height: 100px;text-align: left">
                 <span id="versionType" class="version">v. {{version}}</span>
-                <span style="min-height: 70px;text-align: left">{{description}}</span>
+                <span style="text-align: left">{{description}}</span>
             </div>
-            <div class="card-actions" >
-                <paper-icon-button on-click="install" icon="get-app"></paper-icon-button>
-                <paper-icon-button on-click="demo" icon="image:remove-red-eye"></paper-icon-button>
-                <paper-icon-button on-click="showDoc" icon="info"></paper-icon-button>
-                <paper-icon-button on-click="showSource" icon="code"></paper-icon-button>
+            <div class="card-actions" style="text-align: center" >
+                <div style="width:40px; float:left;">
+                    <paper-icon-button on-click="install" icon="get-app" style="margin-bottom:-20px"></paper-icon-button>
+                    <span class="label">Install</span>
+                </div>
+                <div style="width:40px; float:left;">
+                    <paper-icon-button on-click="demo" icon="image:remove-red-eye" style="margin-bottom:-20px"></paper-icon-button>
+                    <span class="label">Demo</span>
+                </div>
+                <div style="width:40px; float:left;">
+                    <paper-icon-button on-click="showDoc" icon="description" style="margin-bottom:-20px"></paper-icon-button>
+                    <span class="label">Docs</span>
+                </div>
+                <div style="width:40px; float:left;">
+                    <paper-icon-button on-click="showSource" icon="code" style="margin-bottom:-20px"></paper-icon-button>
+                    <span class="label">Source</span>
+                </div>
             </div>
         </paper-card>
 
@@ -91,7 +108,7 @@
             properties: {
                 formattedName: {
                     type: String,
-                    value: "-",
+                    value: "-"
                 },
                 name: {
                     type: String,
@@ -150,7 +167,6 @@
             },
 
             formatSuperType: function() {
-                console.log(this.st)
                 this.$.itemCard.style.background = this.getColourFromType();
             },
 
