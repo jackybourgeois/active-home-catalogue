@@ -93,10 +93,12 @@
                     <paper-icon-button on-click="showDoc" icon="description" style="margin-bottom:-20px"></paper-icon-button>
                     <span class="label">Docs</span>
                 </div>
-                <div style="width:40px; float:left;">
-                    <paper-icon-button on-click="showSource" icon="code" style="margin-bottom:-20px"></paper-icon-button>
-                    <span class="label">Source</span>
-                </div>
+                <a href="{{src}}" style="color: #000000">
+                    <div style="width:40px; float:left;">
+                        <paper-icon-button icon="code" style="margin-bottom:-20px"></paper-icon-button>
+                        <span class="label">Source</span>
+                    </div>
+                </a>
             </div>
         </paper-card>
 
@@ -136,6 +138,10 @@
                     type: String,
                     value: "",
                     observer: "formatSuperType"
+                },
+                src: {
+                    type: String,
+                    value: ""
                 }
             },
             defaultHeight: 2,

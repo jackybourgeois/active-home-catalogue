@@ -41,6 +41,7 @@ public class StoreItem {
     private String doc;
     private String demoScript;
     private String superType;
+    private String src;
 
     public StoreItem(final String name,
                      final String version,
@@ -49,7 +50,8 @@ public class StoreItem {
                      final String img,
                      final String doc,
                      final String demoScript,
-                     final String superType) {
+                     final String superType,
+                     final String src) {
         this.name = name;
         this.version = version;
         this.pack = pack;
@@ -58,6 +60,7 @@ public class StoreItem {
         this.doc = doc;
         this.demoScript = demoScript;
         this.superType = superType;
+        this.src = src;
     }
 
     public StoreItem(final JsonObject json) {
@@ -69,6 +72,7 @@ public class StoreItem {
         this.doc = json.getString("doc", "");
         this.demoScript = json.getString("demoScript", "");
         this.superType = json.getString("superType", "");
+        this.src = json.getString("src", "");
     }
 
     public String getName() {
@@ -110,6 +114,7 @@ public class StoreItem {
         json.add("doc", doc);
         json.add("demoScript", demoScript);
         json.add("superType", superType);
+        json.add("src", src);
         return json;
     }
 

@@ -57,7 +57,8 @@ import java.util.*;
 @ComponentType
 public class Store extends Service {
 
-    private static String BASE_VCS_URL = "https://raw.githubusercontent.com/jackybourgeois";
+    private static String BASE_VCS_URL_RAW = "https://raw.githubusercontent.com/jackybourgeois";
+    private static String BASE_VCS_URL = "https://github.com/jackybourgeois";
 
     @Param(defaultValue = "A catalog of component!")
     private String description;
@@ -67,6 +68,8 @@ public class Store extends Service {
     private String doc;
     @Param(defaultValue = "/activehome-store/master/docs/demo.kevs")
     private String demoScript;
+    @Param(defaultValue = "/activehome-store")
+    private String src;
 
     @Override
     protected RequestHandler getRequestHandler(Request request) {
@@ -150,6 +153,7 @@ public class Store extends Service {
                         String img = "";
                         String doc = "";
                         String demoScript = "";
+                        String src = "";
                         JsonArray dictionaryArray = td.asObject().get("dictionaryType").asArray();
                         if (dictionaryArray.size() > 0) {
                             JsonArray attrArray = dictionaryArray.get(0).asObject().get("attributes").asArray();
@@ -162,23 +166,22 @@ public class Store extends Service {
                                         break;
                                     case "img":
                                         if (attrDefValue.startsWith("/")) {
-                                            img = BASE_VCS_URL + attrDefValue;
+                                            img = BASE_VCS_URL_RAW + attrDefValue;
                                         } else {
                                             img = attrDefValue;
                                         }
                                         break;
                                     case "doc":
-                                        if (attrDefValue.startsWith("/")) {
-                                            doc = attrDefValue;
-                                        } else {
-                                            doc = attrDefValue;
-                                        }
+                                        doc = attrDefValue.replaceAll("/", "--").replace(".","__");
                                         break;
                                     case "demoScript":
+                                        demoScript = attrDefValue.replace("/", "--").replace(".","__");
+                                        break;
+                                    case "src":
                                         if (attrDefValue.startsWith("/")) {
-                                            demoScript = attrDefValue;
+                                            src = BASE_VCS_URL + attrDefValue;
                                         } else {
-                                            demoScript = attrDefValue;
+                                            src = attrDefValue;
                                         }
                                         break;
                                 }
@@ -194,7 +197,7 @@ public class Store extends Service {
                         if (!name.contains("Test") && !isAbstract) {
                             if (!items.containsKey(name) || items.get(name).hasOlderVersionThan(version)) {
                                 items.put(name, new StoreItem(name, version, pack, description,
-                                        img, doc, demoScript, superType));
+                                        img, doc, demoScript, superType, src));
                             }
                         }
                     }
@@ -257,8 +260,8 @@ public class Store extends Service {
     }
 
     public String getContentFrom(String url) {
-        if (url.startsWith("/")) {
-            url = BASE_VCS_URL + url;
+        if (url.startsWith("--")) {
+            url = BASE_VCS_URL_RAW + url.replaceAll("--","/").replaceAll("__",".");
         }
         return sendGet(url, null);
     }

@@ -149,6 +149,7 @@
                                         version="{{item.version}}"
                                         description="{{item.description}}"
                                         img="{{item.img}}"
+                                        src="{{item.src}}"
                                         doc="{{item.doc}}"
                                         demoScript="{{item.demoScript}}"
                                         st="{{item.superType}}">
@@ -203,13 +204,20 @@
             },
 
             filterInput: function (e, detail, sender) {
-                this.filter(new RegExp(e.srcElement.value));
+                var target = e.srcElement;
+                if (target==undefined) {
+                    target = e.target;
+                }
+                this.filter(new RegExp(target.value));
             },
 
             filterBt: function (e, detail, sender) {
-                var regex = new RegExp(e.srcElement.id.split("-")[0]);
+                var target = e.srcElement;
+                if (target==undefined) {
+                    target = e.target;
+                }
+                var regex = new RegExp(target.id.split("-")[0]);
                 this.filteredItemList = this.itemList.filter(function (item, idx, array) {
-                    console.log("compare " + regex + " with " + item.superType)
                     return regex.test(item.superType.toLowerCase());
                 });
             },
