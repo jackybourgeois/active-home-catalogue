@@ -1,3 +1,3 @@
-# activehome-store
+# active-home-catalogue
 
-A component store for Active Home
+Acatalogue of component for Active Home
