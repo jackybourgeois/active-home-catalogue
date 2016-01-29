@@ -67,7 +67,7 @@ public class Catalogue extends Service {
     public void modelUpdated() {
         if (isFirstModelUpdate()) {
             sendRequest(new Request(getFullId(), getNode() + ".http", getCurrentTime(),
-                    "addHandler", new Object[]{"/store", getFullId(), false}), null);
+                    "addHandler", new Object[]{"/catalogue", getFullId(), false}), null);
         }
         super.modelUpdated();
     }
