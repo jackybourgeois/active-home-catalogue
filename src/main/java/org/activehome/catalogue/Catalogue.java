@@ -1,4 +1,4 @@
-package org.activehome.store;
+package org.activehome.catalogue;
 
 /*
  * #%L
@@ -6,7 +6,7 @@ package org.activehome.store;
  * $Id:$
  * $HeadURL:$
  * %%
- * Copyright (C) 2016 org.activehome
+ * Copyright (C) 2016 Active Home Project
  * %%
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as
@@ -31,7 +31,6 @@ import com.eclipsesource.json.JsonValue;
 import org.activehome.com.Request;
 import org.activehome.service.Service;
 import org.activehome.service.RequestHandler;
-import org.activehome.context.data.UserInfo;
 import org.kevoree.annotation.ComponentType;
 import org.kevoree.annotation.Param;
 import org.kevoree.log.Log;

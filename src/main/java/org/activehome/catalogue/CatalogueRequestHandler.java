@@ -1,4 +1,4 @@
-package org.activehome.store;
+package org.activehome.catalogue;
 
 /*
  * #%L
@@ -6,7 +6,7 @@ package org.activehome.store;
  * $Id:$
  * $HeadURL:$
  * %%
- * Copyright (C) 2016 org.activehome
+ * Copyright (C) 2016 Active Home Project
  * %%
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as
@@ -29,14 +29,9 @@ import com.eclipsesource.json.JsonObject;
 import com.eclipsesource.json.JsonValue;
 import org.activehome.com.Request;
 import org.activehome.com.RequestCallback;
-import org.activehome.com.error.*;
-import org.activehome.com.error.Error;
 import org.activehome.service.RequestHandler;
 import org.activehome.tools.file.FileHelper;
 import org.activehome.tools.file.TypeMime;
-import org.activehome.context.data.UserInfo;
-
-import java.io.UnsupportedEncodingException;
 
 /**
  * @author Jacky Bourgeois
