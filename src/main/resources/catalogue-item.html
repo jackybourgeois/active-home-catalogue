@@ -1,6 +1,6 @@
 <!--
   #%L
-  Active Home :: Store
+  Active Home :: Catalogue
   $Id:$
   $HeadURL:$
   %%
@@ -77,7 +77,8 @@
 
         <paper-card id="itemCard" heading="{{formattedName}}" style="width: 300px; margin: 10px" >
             <div class="card-content" style="height: 100px;text-align: left">
-                <span id="versionType" class="version">v. {{version}}</span>
+                <span id="release" class="version" style="background: green">v. {{release}}</span>
+                <span id="snapshot" class="version" style="background: orangered">v. {{snapshot}}</span>
                 <span style="text-align: left">{{description}}</span>
             </div>
             <div class="card-actions" style="text-align: center" >
@@ -90,10 +91,10 @@
                     <span class="label">Demo</span>
                 </div>
                 <div style="width:40px; float:left;">
-                    <paper-icon-button on-click="showDoc" icon="description" style="margin-bottom:-20px"></paper-icon-button>
+                    <paper-icon-button on-click="docs" icon="description" style="margin-bottom:-20px"></paper-icon-button>
                     <span class="label">Docs</span>
                 </div>
-                <a href="{{src}}" style="color: #000000">
+                <a href="{{srcLink}}" style="color: #000000" target="_blank">
                     <div style="width:40px; float:left;">
                         <paper-icon-button icon="code" style="margin-bottom:-20px"></paper-icon-button>
                         <span class="label">Source</span>
@@ -107,6 +108,9 @@
     <script>
         Polymer({
             is: 'store-item',
+            BASE_VCS_URL_RAW: "https://raw.githubusercontent.com/jackybourgeois",
+            BASE_VCS_URL: "https://github.com/jackybourgeois",
+
             properties: {
                 formattedName: {
                     type: String,
@@ -118,21 +122,13 @@
                     observer: "formatName"
                 },
                 version: {
-                    type: String,
-                    value: "-",
+                    type: Array,
+                    value: [],
                     observer: "formatVersion"
                 },
                 description: {
                     type: String,
                     value: "-"
-                },
-                doc: {
-                    type: String,
-                    value: ""
-                },
-                demoScript: {
-                    type: String,
-                    value: ""
                 },
                 st: {
                     type: String,
@@ -141,7 +137,8 @@
                 },
                 src: {
                     type: String,
-                    value: ""
+                    value: "",
+                    observer: "formatSrcLink"
                 }
             },
             defaultHeight: 2,
@@ -165,11 +162,53 @@
             },
 
             formatVersion: function() {
+                for (var i in this.versions) {
+                    if (this.isRelease(versions[i])) {
+                        if (this.release==undefined || this.compare(version[i], this.release)==1) {
+                            this.release = version[i];
+                        }
+                    } else {
+                        if (this.snapshot==undefined || this.compare(version[i], this.snapshot)==1) {
+                            this.snapshot = version[i];
+                        }
+                    }
+                }
                 if (this.version.endsWith("SNAPSHOT")) {
                     this.$.versionType.style.background = "orangered";
                 } else {
                     this.$.versionType.style.background = "green";
                 }
+            },
+
+            formatSrcLink: function() {
+                if (this.src.startsWith("/")) {
+                    this.srcLink = this.BASE_VCS_URL + this.src;
+                } else {
+                    this.srcLink = this.src;
+                }
+            },
+
+            isRelease: function(version) {
+                return version.split("-").length==1;
+            },
+
+            compareVersions: function(version1, version2) {
+                var vers1Num = version1.split("-")[0].split("\\.");
+                vers1 = Integer.valueOf(vers1Num[0])*100
+                        + Integer.valueOf(vers1Num[1])*10
+                        + Integer.valueOf(vers1Num[2]);
+
+                var vers2Num = version2.split("-")[0].split("\\.");
+                vers2 = Integer.valueOf(vers2Num[0])*100
+                        + Integer.valueOf(vers2Num[1])*10
+                        + Integer.valueOf(vers2Num[2]);
+
+                if (vers2>vers1) {
+                    return 1;
+                } else if (vers2<vers1) {
+                    return -1;
+                }
+                return 0;
             },
 
             formatSuperType: function() {
@@ -217,13 +256,8 @@
                 console.log(this.demoScript);
             },
 
-            showSource: function() {
-                console.log("show source");
-            },
-
-            showDoc: function() {
-                console.log(this.doc);
-                this.fire('select-info-bt', {doc: this.doc});
+            docs: function() {
+                this.fire('select-info-bt', {name: this.name, src: this.src});
             },
 
             guid: function () {

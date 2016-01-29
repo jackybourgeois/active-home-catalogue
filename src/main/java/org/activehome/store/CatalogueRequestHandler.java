@@ -2,7 +2,7 @@ package org.activehome.store;
 
 /*
  * #%L
- * Active Home :: Store
+ * Active Home :: Catalogue
  * $Id:$
  * $HeadURL:$
  * %%
@@ -42,12 +42,12 @@ import java.io.UnsupportedEncodingException;
  * @author Jacky Bourgeois
  * @version %I%, %G%
  */
-public class StoreRequestHandler implements RequestHandler {
+public class CatalogueRequestHandler implements RequestHandler {
 
-    private final Store service;
+    private final Catalogue service;
     private final Request request;
 
-    public StoreRequestHandler(Request request, Store service) {
+    public CatalogueRequestHandler(Request request, Catalogue service) {
         this.service = service;
         this.request = request;
     }
@@ -57,23 +57,18 @@ public class StoreRequestHandler implements RequestHandler {
         JsonObject wrap = new JsonObject();
         wrap.add("name", "store-view");
         wrap.add("url", service.getId() + "/store-view.html");
-        wrap.add("title", "Active Home Store");
-        wrap.add("description", "Active Home Store");
+        wrap.add("title", "Active Home Catalogue");
+        wrap.add("description", "Active Home Catalogue");
 
         JsonObject json = new JsonObject();
         json.add("wrap", wrap);
         callback.success(json);
     }
 
-    public void doc(final String url,
+    public void doc(final String src,
+                    final String name,
                     final RequestCallback callback) {
-        try {
-            callback.success(service.getContentFrom(
-                    java.net.URLDecoder.decode(url, "UTF-8")));
-        } catch (UnsupportedEncodingException e) {
-            e.printStackTrace();
-            callback.error(new Error(ErrorType.METHOD_ERROR, "Unable to parse URL " + url));
-        }
+        callback.success(service.getContentFrom(src, name));
     }
 
     public JsonValue file(String str) {
@@ -88,17 +83,7 @@ public class StoreRequestHandler implements RequestHandler {
         return json;
     }
 
-    public Object library() {
-        Object userInfo = request.getEnviElem().get("userInfo");
-        if (userInfo!=null && userInfo instanceof UserInfo) {
-            JsonObject json = new JsonObject();
-            json.add("library", service.getLibrary((UserInfo) userInfo));
-            return json;
-        }
-        return new Error(ErrorType.PERMISSION_DENIED,"User info missing.");
-    }
-
-    public StoreItem[] getStoreItems() {
+    public CatalogueItem[] getStoreItems() {
         return service.getStoreItems();
     }
 

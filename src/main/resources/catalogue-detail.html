@@ -1,6 +1,6 @@
 <!--
   #%L
-  Active Home :: Store
+  Active Home :: Catalogue
   $Id:$
   $HeadURL:$
   %%
@@ -64,9 +64,10 @@
             ready: function () {
                 var comp = this;
                 window.addEventListener('select-info-bt', function (e) {
+                    var src = e.detail.src.replace("/","--").replace(".","__");
                     var ajax = comp.$.ajax;
                     ajax.method = "GET";
-                    ajax.url = "/${id}/doc/" + encodeURIComponent(e.detail.doc);
+                    ajax.url = "/${id}/doc/" + src + "/" + e.detail.name;
                     ajax.generateRequest();
                     comp.$.spinner.display();
                 });

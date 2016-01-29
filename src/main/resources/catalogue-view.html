@@ -1,6 +1,6 @@
 <!--
   #%L
-  Active Home :: Store
+  Active Home :: Catalogue
   $Id:$
   $HeadURL:$
   %%
@@ -135,7 +135,7 @@
                 <paper-toolbar>
                     <paper-icon-button icon="menu" paper-drawer-toggle></paper-icon-button>
                     <div class="bottom">
-                        <h2 style="color: #ffffff">Component Catalog</h2>
+                        <h2 style="color: #ffffff">Component Catalogue</h2>
                     </div>
                 </paper-toolbar>
 
@@ -146,13 +146,10 @@
                         <store-detail></store-detail>
                         <template is="dom-repeat" items="{{filteredItemList}}">
                             <store-item name="{{item.name}}"
-                                        version="{{item.version}}"
+                                        version="{{item.versions}}"
                                         description="{{item.description}}"
-                                        img="{{item.img}}"
                                         src="{{item.src}}"
-                                        doc="{{item.doc}}"
-                                        demoScript="{{item.demoScript}}"
-                                        st="{{item.superType}}">
+                                        st="{{item.superTypes}}">
                             </store-item>
                         </template>
                     </section>
@@ -218,7 +215,12 @@
                 }
                 var regex = new RegExp(target.id.split("-")[0]);
                 this.filteredItemList = this.itemList.filter(function (item, idx, array) {
-                    return regex.test(item.superType.toLowerCase());
+                    for (var i in item.superTypes) {
+                        if (regex.test(item.superTypes[i].toLowerCase())) {
+                            return true;
+                        }
+                    }
+                    return false;
                 });
             },
 
