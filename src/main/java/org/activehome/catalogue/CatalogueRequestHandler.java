@@ -50,8 +50,8 @@ public class CatalogueRequestHandler implements RequestHandler {
 
     public void html(final RequestCallback callback) {
         JsonObject wrap = new JsonObject();
-        wrap.add("name", "store-view");
-        wrap.add("url", service.getId() + "/store-view.html");
+        wrap.add("name", "catalogue-view");
+        wrap.add("url", service.getId() + "/catalogue-view.html");
         wrap.add("title", "Active Home Catalogue");
         wrap.add("description", "Active Home Catalogue");
 
@@ -78,8 +78,8 @@ public class CatalogueRequestHandler implements RequestHandler {
         return json;
     }
 
-    public CatalogueItem[] getStoreItems() {
-        return service.getStoreItems();
+    public CatalogueItem[] getCatalogueItems() {
+        return service.getCatalogueItems();
     }
 
 }

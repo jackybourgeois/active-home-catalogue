@@ -8,7 +8,7 @@
     <artifactId>org.active-home.catalogue</artifactId>
     <version>0.0.1-SNAPSHOT</version>
     <packaging>jar</packaging>
-    <name>Active Home :: Store</name>
+    <name>Active Home :: Catalogue</name>
     <description>A catalogue of component for Active Home</description>
     <url>http://active-home.org</url>
 

@@ -55,7 +55,7 @@ public class Catalogue extends Service {
 
     @Param(defaultValue = "A catalog of Active Home components!")
     private String description;
-    @Param(defaultValue = "/active-home-store")
+    @Param(defaultValue = "/active-home-catalogue")
     private String src;
 
     @Override
@@ -77,7 +77,7 @@ public class Catalogue extends Service {
      *
      * @return
      */
-    public CatalogueItem[] getStoreItems() {
+    public CatalogueItem[] getCatalogueItems() {
         String response = sendGet("http://registry.kevoree.org/", null);
 
         HashMap<String, CatalogueItem> items = new HashMap<>();

@@ -36,12 +36,12 @@
 <link rel="import" href="/bower_components/paper-icon-button/paper-icon-button.html">
 <link rel="import" href="/bower_components/paper-drawer-panel/paper-drawer-panel.html">
 <link rel="import" href="/bower_components/paper-item/paper-item.html">
-<link rel="import" href="/${id}/store-detail.html">
-<link rel="import" href="/${id}/store-item.html">
+<link rel="import" href="/${id}/catalogue-detail.html">
+<link rel="import" href="/${id}/catalogue-item.html">
 <link rel="import" href="/loading-spinner.html">
 
 
-<dom-module id="store-view">
+<dom-module id="catalogue-view">
 
     <link rel="import" href="https://raw.githubusercontent.com/jackybourgeois/active-home/master/docs/branding/theme.css" type="css">
 
@@ -142,14 +142,14 @@
                     <loading-spinner id="spinner"></loading-spinner>
 
                     <section style="max-width:1200px;min-height:800px;margin:auto;text-align: center;">
-                        <store-detail></store-detail>
+                        <catalogue-detail></catalogue-detail>
                         <template is="dom-repeat" items="{{filteredItemList}}">
-                            <store-item name="{{item.name}}"
+                            <catalogue-item name="{{item.name}}"
                                         version="{{item.versions}}"
                                         description="{{item.description}}"
                                         src="{{item.src}}"
                                         st="{{item.superTypes}}">
-                            </store-item>
+                            </catalogue-item>
                         </template>
                     </section>
                 </div>
@@ -161,7 +161,7 @@
 
     <script>
         Polymer({
-            is: 'store-view',
+            is: 'catalogue-view',
             itemList: [],
             filteredItemList: null,
 
@@ -169,7 +169,7 @@
                 this.$.spinner.display();
                 var ajax = this.$.ajax;
                 ajax.method = "GET";
-                ajax.url = "/${id}/getStoreItems";
+                ajax.url = "/${id}/getCatalogueItems";
                 ajax.generateRequest();
             },
 
