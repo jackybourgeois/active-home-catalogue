@@ -64,7 +64,7 @@
             ready: function () {
                 var comp = this;
                 window.addEventListener('select-info-bt', function (e) {
-                    var src = e.detail.src.replace("/","--").replace(".","__");
+                    var src = e.detail.src.split('/').join('--').split('.').join('__');
                     var ajax = comp.$.ajax;
                     ajax.method = "GET";
                     ajax.url = "/${id}/doc/" + src + "/" + e.detail.name;

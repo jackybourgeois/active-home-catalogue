@@ -77,8 +77,9 @@
 
         <paper-card id="itemCard" heading="{{formattedName}}" style="width: 300px; margin: 10px" >
             <div class="card-content" style="height: 100px;text-align: left">
-                <span id="release" class="version" style="background: green">v. {{release}}</span>
-                <span id="snapshot" class="version" style="background: orangered">v. {{snapshot}}</span>
+                <paper-dropdown-menu label="Version">
+                    </paper-menu>
+                </paper-dropdown-menu>
                 <span style="text-align: left">{{description}}</span>
             </div>
             <div class="card-actions" style="text-align: center" >
@@ -137,7 +138,7 @@
                 },
                 src: {
                     type: String,
-                    value: "",
+                    value: [],
                     observer: "formatSrcLink"
                 }
             },
@@ -163,20 +164,15 @@
 
             formatVersion: function() {
                 for (var i in this.versions) {
-                    if (this.isRelease(versions[i])) {
-                        if (this.release==undefined || this.compare(version[i], this.release)==1) {
-                            this.release = version[i];
+                    if (this.isRelease(this.versions[i])) {
+                        if (this.release==undefined || this.compareVersions(this.version[i], this.release)>=0) {
+                            this.release = this.version[i];
                         }
                     } else {
-                        if (this.snapshot==undefined || this.compare(version[i], this.snapshot)==1) {
-                            this.snapshot = version[i];
+                        if (this.snapshot==undefined || this.compareVersions(this.version[i], this.snapshot)>=0) {
+                            this.snapshot = this.version[i];
                         }
                     }
-                }
-                if (this.version.endsWith("SNAPSHOT")) {
-                    this.$.versionType.style.background = "orangered";
-                } else {
-                    this.$.versionType.style.background = "green";
                 }
             },
 
@@ -217,9 +213,9 @@
 
             getColourFromType: function () {
                 if (this.name=="User") {
-                    this.st="User";
+                    this.st.push("User");
                 }
-                switch (this.st) {
+                switch (this.st[this.st.length-1]) {
                     case "IO": return "#d38d5f";
                     case "Appliance": return "#d38d5f";
                     case "MicroGeneration": return "#d38d5f";

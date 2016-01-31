@@ -60,7 +60,7 @@ public class CatalogueRequestHandler implements RequestHandler {
         callback.success(json);
     }
 
-    public void doc(final String src,
+    public void docs(final String src,
                     final String name,
                     final RequestCallback callback) {
         callback.success(service.getContentFrom(src, name));

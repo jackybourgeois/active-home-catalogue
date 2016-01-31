@@ -53,6 +53,8 @@ public class CatalogueItem {
         this.description = description;
         this.pack = pack;
         this.src = src;
+        this.versions = new HashSet<>();
+        this.superTypes = new HashSet<>();
     }
 
     public CatalogueItem(final JsonObject json) {

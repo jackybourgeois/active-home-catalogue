@@ -109,7 +109,7 @@ public class Catalogue extends Service {
                     String name = td.asObject().get("name").asString();
                     boolean isAbstract = Boolean.valueOf(td.asObject().get("abstract").asString());
 
-                    if (isAbstract) {
+                    if (!isAbstract) {
                         if (!items.containsKey(name)) {
                             // search attributes
                             String description = "";
@@ -125,11 +125,7 @@ public class Catalogue extends Service {
                                             description = attrDefValue;
                                             break;
                                         case "src":
-                                            if (attrDefValue.startsWith("/")) {
-                                                src = BASE_VCS_URL + attrDefValue;
-                                            } else {
-                                                src = attrDefValue;
-                                            }
+                                            src = attrDefValue;
                                             break;
                                     }
                                 }
@@ -218,7 +214,7 @@ public class Catalogue extends Service {
         if (src.startsWith("--")) {
             src = BASE_VCS_URL_RAW + src.replaceAll("--", "/").replaceAll("__", ".");
         }
-        return sendGet(src + "/master/docs/" + name + ".md", null);
+        return sendGet(src + "/docs/" + name + ".md", null);
     }
 
 }
