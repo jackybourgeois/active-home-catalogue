@@ -29,8 +29,9 @@ import com.eclipsesource.json.JsonArray;
 import com.eclipsesource.json.JsonObject;
 import com.eclipsesource.json.JsonValue;
 import org.activehome.com.Request;
-import org.activehome.service.Service;
+import org.activehome.com.RequestCallback;
 import org.activehome.service.RequestHandler;
+import org.activehome.service.Service;
 import org.kevoree.annotation.ComponentType;
 import org.kevoree.annotation.Param;
 import org.kevoree.log.Log;
@@ -41,7 +42,8 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.URL;
-import java.util.*;
+import java.util.HashMap;
+import java.util.List;
 
 /**
  * @author Jacky Bourgeois
@@ -57,6 +59,54 @@ public class Catalogue extends Service {
     private String description;
     @Param(defaultValue = "/active-home-catalogue")
     private String src;
+
+    public static String sendGet(final String url,
+                                 final List<String> cookieList) {
+        try {
+            URL obj = new URL(url);
+            HttpURLConnection con = (HttpURLConnection) obj.openConnection();
+
+            //add request header
+            con.setRequestProperty("User-Agent", "Mozilla/5.0");
+            con.setRequestProperty("Accept", "application/json");
+            con.setRequestProperty("Content-Type", "application/json");
+            if (cookieList != null) {
+                for (String cookie : cookieList) {
+                    con.addRequestProperty("Cookie", cookie);
+                }
+            }
+
+            int responseCode = con.getResponseCode();
+
+            return inputStreamToString(con.getInputStream());
+
+        } catch (IOException e) {
+            Log.error(e.getMessage());
+            return "";
+        }
+    }
+
+    public static String inputStreamToString(InputStream is) {
+        BufferedReader in = new BufferedReader(new InputStreamReader(is));
+        String inputLine;
+        StringBuilder response = new StringBuilder();
+
+        try {
+            while ((inputLine = in.readLine()) != null) {
+                response.append(inputLine).append("\n");
+            }
+        } catch (IOException e) {
+            Log.error(e.getMessage());
+        } finally {
+            try {
+                in.close();
+            } catch (IOException e) {
+                Log.error(e.getMessage());
+            }
+        }
+
+        return response.toString();
+    }
 
     @Override
     protected RequestHandler getRequestHandler(Request request) {
@@ -161,52 +211,11 @@ public class Catalogue extends Service {
         }
     }
 
-    public static String sendGet(final String url,
-                                 final List<String> cookieList) {
-        try {
-            URL obj = new URL(url);
-            HttpURLConnection con = (HttpURLConnection) obj.openConnection();
-
-            //add request header
-            con.setRequestProperty("User-Agent", "Mozilla/5.0");
-            con.setRequestProperty("Accept", "application/json");
-            con.setRequestProperty("Content-Type", "application/json");
-            if (cookieList != null) {
-                for (String cookie : cookieList) {
-                    con.addRequestProperty("Cookie", cookie);
-                }
-            }
-
-            int responseCode = con.getResponseCode();
-
-            return inputStreamToString(con.getInputStream());
-
-        } catch (IOException e) {
-            Log.error(e.getMessage());
-            return "";
-        }
-    }
-
-    public static String inputStreamToString(InputStream is) {
-        BufferedReader in = new BufferedReader(new InputStreamReader(is));
-        String inputLine;
-        StringBuilder response = new StringBuilder();
-
-        try {
-            while ((inputLine = in.readLine()) != null) {
-                response.append(inputLine).append("\n");
-            }
-        } catch (IOException e) {
-            Log.error(e.getMessage());
-        } finally {
-            try {
-                in.close();
-            } catch (IOException e) {
-                Log.error(e.getMessage());
-            }
-        }
-
-        return response.toString();
+    public void pushDemo(final String script,
+                         final RequestCallback callback) {
+        Request request = new Request(getFullId(), getNode() + ".linker", getCurrentTime(),
+                "pushScript", new Object[]{script});
+        sendRequest(request, callback);
     }
 
     public String getContentFrom(String src,
