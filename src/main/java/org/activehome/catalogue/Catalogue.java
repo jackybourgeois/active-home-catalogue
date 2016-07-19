@@ -128,7 +128,7 @@ public class Catalogue extends Service {
      * @return
      */
     public CatalogueItem[] getCatalogueItems() {
-        String response = sendGet("http://registry.kevoree.org/", null);
+        String response = sendGet("http://registry.kevoree.org/org/activehome", null);
 
         HashMap<String, CatalogueItem> items = new HashMap<>();
         JsonObject root = JsonObject.readFrom(response);
@@ -207,6 +207,7 @@ public class Catalogue extends Service {
                     }
                     searchPackage(items, jsonPack);
                 }
+                searchPackage(items, jsonPack);
             }
         }
     }
