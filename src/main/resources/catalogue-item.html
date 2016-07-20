@@ -27,7 +27,6 @@
 <link rel="import" href="/bower_components/iron-icons/iron-icons.html">
 <link rel="import" href="/bower_components/iron-icons/image-icons.html">
 <link rel="import" href="/bower_components/paper-card/paper-card.html">
-<link rel="import" href="/bower_components/iron-ajax/iron-ajax.html">
 
 <dom-module id="catalogue-item">
 
@@ -76,7 +75,6 @@
 
         </style>
 
-        <iron-ajax id="ajax" handle-as="json" on-response="handleResponse"></iron-ajax>
         <paper-card id="itemCard" heading="{{formattedName}}" style="width: 300px; margin: 10px" >
             <div class="card-content" style="height: 100px;text-align: left">
                 <paper-dropdown-menu label="Version">
@@ -142,6 +140,10 @@
                     type: String,
                     value: [],
                     observer: "formatSrcLink"
+                },
+                demoScript: {
+                    type: String,
+                    value: ""
                 }
             },
             defaultHeight: 2,
@@ -251,14 +253,7 @@
             },
 
             demo: function() {
-                if (this.demoScript!=undefined) {
-                    var ajax = comp.$.ajax;
-                    ajax.method = "GET";
-                    ajax.url = "/${id}/pushDemo";
-                    ajax.body = this.demoScript;
-                    comp.fire('sent-ajax', {url: ajax.url});
-                    ajax.generateRequest();
-                }
+                this.fire('select-demo-bt', {name: this.name, src: this.src});
             },
 
             docs: function() {

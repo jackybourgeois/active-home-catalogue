@@ -164,6 +164,7 @@ public class Catalogue extends Service {
                             // search attributes
                             String description = "";
                             String src = "";
+                            String demoScript = "";
                             JsonArray dictionaryArray = td.asObject().get("dictionaryType").asArray();
                             if (dictionaryArray.size() > 0) {
                                 JsonArray attrArray = dictionaryArray.get(0).asObject().get("attributes").asArray();
@@ -188,8 +189,8 @@ public class Catalogue extends Service {
                                     pack = md.asObject().get("value").asString();
                                 }
                             }
-
-                            items.put(name, new CatalogueItem(name, description, pack, src));
+                            CatalogueItem item = new CatalogueItem(name, description, pack, src);
+                            items.put(name, item);
                         }
 
                         CatalogueItem item = items.get(name);
@@ -212,19 +213,30 @@ public class Catalogue extends Service {
         }
     }
 
-    public void pushDemo(final String script,
+    public void pushDemo(final String scr,
+                         final String name,
                          final RequestCallback callback) {
+        String demoScript = getDemoScriptFrom(scr, name);
+        logInfo("Ready to push demo for " + name + ":\n" + demoScript);
         Request request = new Request(getFullId(), getNode() + ".linker", getCurrentTime(),
-                "pushScript", new Object[]{script});
+                "pushScript", new Object[]{demoScript});
         sendRequest(request, callback);
     }
 
     public String getContentFrom(String src,
                                  String name) {
         if (src.startsWith("--")) {
-            src = BASE_VCS_URL_RAW + src.replaceAll("--", "/").replaceAll("__", ".");
+            src = BASE_VCS_URL_RAW + src.replaceAll("--", "/").replaceAll("__", ".").replace("/tree", "");
         }
         return sendGet(src + "/docs/" + name + ".md", null);
+    }
+
+    public String getDemoScriptFrom(String src,
+                                    String name) {
+        if (src.startsWith("--")) {
+            src = BASE_VCS_URL_RAW + src.replaceAll("--", "/").replaceAll("__", ".").replace("/tree", "");
+        }
+        return sendGet(src + "/docs/Demo" + name + ".kevs", null);
     }
 
 }

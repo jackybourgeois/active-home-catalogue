@@ -66,9 +66,10 @@ public class CatalogueRequestHandler implements RequestHandler {
         callback.success(service.getContentFrom(src, name));
     }
 
-    public void pushDemo(final String script,
+    public void pushDemo(final String src,
+                         final String name,
                          final RequestCallback callback) {
-        service.pushDemo(script, callback);
+        service.pushDemo(src, name, callback);
     }
 
     public JsonValue file(String str) {

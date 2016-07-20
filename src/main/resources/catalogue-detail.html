@@ -25,7 +25,7 @@
 <link rel="import" href="/bower_components/paper-button/paper-button.html">
 <link rel="import" href="/bower_components/iron-icon/iron-icon.html">
 <link rel="import" href="/bower_components/mark-down/mark-down.html">
-<link rel="import" href="/loading-spinner.html">
+<link rel="import" href="/bower_components/active-home-branding/loading-spinner.html">
 
 <dom-module id="catalogue-detail">
 
@@ -67,9 +67,17 @@
                     var src = e.detail.src.split('/').join('--').split('.').join('__');
                     var ajax = comp.$.ajax;
                     ajax.method = "GET";
-                    ajax.url = "/${id}/doc/" + src + "/" + e.detail.name;
+                    ajax.url = "/${id}/docs/" + src + "/" + e.detail.name;
                     ajax.generateRequest();
                     comp.$.spinner.display();
+                });
+
+                window.addEventListener('select-demo-bt', function (e) {
+                    var src = e.detail.src.split('/').join('--').split('.').join('__');
+                    var ajax = comp.$.ajax;
+                    ajax.method = "GET";
+                    ajax.url = "/${id}/pushDemo/" + src + "/" + e.detail.name;
+                    ajax.generateRequest();
                 });
             },
 
